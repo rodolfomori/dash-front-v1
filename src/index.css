@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados */
+.recharts-tooltip-wrapper {
+  @apply shadow-lg rounded-lg;
+}
+
+.recharts-default-tooltip {
+  @apply bg-white bg-opacity-95 rounded-lg shadow-lg border-none !important;
+}
+
+.recharts-tooltip-label {
+  @apply text-gray-700 font-medium !important;
+}
+
+.recharts-tooltip-item {
+  @apply text-gray-600 !important;
+}
