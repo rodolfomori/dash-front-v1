@@ -104,9 +104,7 @@ function MonthlyDashboard() {
       )
 
       // Criar mapa de dados diários
-      const dailyDataMap = {}
-
-      // Inicializar todos os dias do mês com zeros
+      const dailyDataMap = {} // Inicializar todos os dias do mês com zeros
       const start = new Date(firstDayOfMonth)
       const end = new Date(lastDayOfMonth)
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -202,43 +200,45 @@ function MonthlyDashboard() {
 
   // Renderização dos dados
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <h1 className="text-3xl font-bold text-primary dark:text-secondary mb-8">
           Dashboard de Metas Mensais
         </h1>
 
         {/* Resumo Mensal */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Valor Total de Vendas
             </h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">
+            <p className="mt-2 text-3xl font-bold text-accent1 dark:text-accent2">
               {formatCurrency(monthlyData?.totals?.total_net_amount || 0)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Quantidade de Vendas
             </h3>
-            <p className="mt-2 text-3xl font-bold text-green-600">
+            <p className="mt-2 text-3xl font-bold text-accent3 dark:text-accent4">
               {monthlyData?.totals?.total_transactions || 0}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Valor de Afiliações
             </h3>
-            <p className="mt-2 text-3xl font-bold text-orange-500">
+            <p className="mt-2 text-3xl font-bold text-secondary dark:text-primary">
               {formatCurrency(
                 monthlyData?.totals?.total_net_affiliate_value || 0,
               )}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Ticket Médio</h3>
-            <p className="mt-2 text-3xl font-bold text-purple-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
+              Ticket Médio
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-accent4 dark:text-accent3">
               {formatCurrency(
                 monthlyData?.totals?.total_net_amount &&
                   monthlyData?.totals?.total_transactions
@@ -253,9 +253,12 @@ function MonthlyDashboard() {
         {/* Metas e Progresso */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {['meta', 'superMeta', 'ultraMeta'].map((metaType) => (
-            <div key={metaType} className="bg-white rounded-lg shadow p-6">
+            <div
+              key={metaType}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+            >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
                   {metaType === 'meta'
                     ? 'Meta'
                     : metaType === 'superMeta'
@@ -265,14 +268,14 @@ function MonthlyDashboard() {
                 {editingGoal !== metaType ? (
                   <button
                     onClick={() => setEditingGoal(metaType)}
-                    className="text-blue-500 hover:text-blue-700"
+                    className="text-primary dark:text-secondary hover:text-secondary dark:hover:text-primary"
                   >
                     Editar
                   </button>
                 ) : (
                   <button
                     onClick={() => saveGoal(metaType)}
-                    className="text-green-500 hover:text-green-700"
+                    className="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
                   >
                     OK
                   </button>
@@ -283,17 +286,17 @@ function MonthlyDashboard() {
                   type="text"
                   value={goals[metaType]}
                   onChange={(e) => handleGoalChange(metaType, e.target.value)}
-                  className="w-full border rounded px-2 py-1"
+                  className="w-full border rounded px-2 py-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
                 />
               ) : (
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-accent1 dark:text-accent2">
                   {goals[metaType]}
                 </p>
               )}
               <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                   <div
-                    className="bg-blue-600 h-2.5 rounded-full"
+                    className="bg-primary dark:bg-secondary h-2.5 rounded-full"
                     style={{
                       width: `${Math.min(
                         metaProgress[metaType].actualProgress,
@@ -305,8 +308,8 @@ function MonthlyDashboard() {
                 <p
                   className={`text-sm mt-1 ${
                     metaProgress[metaType].difference >= 0
-                      ? 'text-green-600'
-                      : 'text-red-600'
+                      ? 'text-green-500 dark:text-green-400'
+                      : 'text-red-500 dark:text-red-400'
                   }`}
                 >
                   {metaProgress[metaType].difference >= 0 ? '+' : ''}
@@ -323,8 +326,8 @@ function MonthlyDashboard() {
         {/* Gráficos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Gráfico de Barras */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">
               Vendas Diárias
             </h3>
             <div className="h-80">
@@ -338,7 +341,7 @@ function MonthlyDashboard() {
                   <YAxis
                     yAxisId="left"
                     orientation="left"
-                    stroke="#2563EB"
+                    stroke="#404b62"
                     tickFormatter={formatCurrency}
                   />
                   <YAxis yAxisId="right" orientation="right" stroke="#059669" />
@@ -380,8 +383,8 @@ function MonthlyDashboard() {
           </div>
 
           {/* Gráfico de Linha */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">
               Progressão Mensal
             </h3>
             <div className="h-80">

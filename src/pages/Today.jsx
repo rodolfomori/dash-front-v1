@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { formatCurrency } from '../utils/currencyUtils';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+const COLORS = ['#8A2BE2', '#00FF00', '#FF4500', '#1E90FF', '#FFD700', '#FF1493'];
 
 function Today() {
   const [todayData, setTodayData] = useState(null);
@@ -82,37 +82,41 @@ function Today() {
   }, [fetchTodayData]);
 
   if (loading) {
-    return <div>Carregando...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-background-light dark:bg-background-dark">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary dark:border-secondary"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard de Hoje</h1>
+        <h1 className="text-3xl font-bold text-primary dark:text-secondary mb-8">Dashboard de Hoje</h1>
 
         {/* Resumo do dia */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Valor Total de Vendas</h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">Valor Total de Vendas</h3>
+            <p className="mt-2 text-3xl font-bold text-accent1 dark:text-accent2">
               {formatCurrency(todayData.totalValue)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Quantidade de Vendas</h3>
-            <p className="mt-2 text-3xl font-bold text-green-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">Quantidade de Vendas</h3>
+            <p className="mt-2 text-3xl font-bold text-accent3 dark:text-accent4">
               {todayData.totalSales}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Valor de Afiliações</h3>
-            <p className="mt-2 text-3xl font-bold text-orange-500">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">Valor de Afiliações</h3>
+            <p className="mt-2 text-3xl font-bold text-secondary dark:text-primary">
               {formatCurrency(todayData.totalAffiliateValue)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Ticket Médio</h3>
-            <p className="mt-2 text-3xl font-bold text-purple-600">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">Ticket Médio</h3>
+            <p className="mt-2 text-3xl font-bold text-accent4 dark:text-accent3">
               {formatCurrency(todayData.totalSales > 0 ? todayData.totalValue / todayData.totalSales : 0)}
             </p>
           </div>
@@ -121,8 +125,8 @@ function Today() {
         {/* Gráficos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Progressão por Hora */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Progressão por Hora</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">Progressão por Hora</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={todayData.hourlyData}>
@@ -140,8 +144,8 @@ function Today() {
           </div>
 
           {/* Vendas por Produto */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Vendas por Produto</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">Vendas por Produto</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -167,8 +171,8 @@ function Today() {
           </div>
 
           {/* Quantidade de Vendas por Produto */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Quantidade de Vendas por Produto</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">Quantidade de Vendas por Produto</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={todayData.productData}>
@@ -184,8 +188,8 @@ function Today() {
           </div>
 
           {/* Valor de Afiliações por Hora */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Valor de Afiliações por Hora</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">Valor de Afiliações por Hora</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={todayData.hourlyData}>

@@ -131,15 +131,15 @@ function DailyDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-background-light dark:bg-background-dark p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-primary dark:text-secondary">
             Dashboard Diário de Vendas
           </h1>
           <button
             onClick={handleRefreshData}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-secondary text-primary px-4 py-2 rounded hover:bg-primary hover:text-secondary transition-colors"
           >
             Atualizar Dados
           </button>
@@ -147,67 +147,66 @@ function DailyDashboard() {
 
         <div className="flex gap-4 items-center mb-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-1">
               Data Inicial
             </label>
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => handleDateChange('start', e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-1">
               Data Final
             </label>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => handleDateChange('end', e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Valor Líquido Total
             </h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">
+            <p className="mt-2 text-3xl font-bold text-accent1 dark:text-accent2">
               {formatCurrency(data?.totals?.total_net_amount || 0)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Quantidade de Vendas
             </h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">
+            <p className="mt-2 text-3xl font-bold text-accent3 dark:text-accent4">
               {data?.totals?.total_transactions || 0}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-text-light dark:text-text-dark">
               Valor de Afiliações
             </h3>
-
-            <p className="mt-2 text-3xl font-bold text-orange-500">
+            <p className="mt-2 text-3xl font-bold text-secondary dark:text-primary">
               {formatCurrency(data?.totals?.total_net_affiliate_value || 0)}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 relative">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 relative">
+          <h3 className="text-lg font-medium text-text-light dark:text-text-dark mb-4">
             Vendas por Dia
           </h3>
           <div className="h-96 relative">
             {loading && (
-              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+              <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center z-10">
                 <div className="flex flex-col items-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                  <p className="text-gray-600">Carregando dados...</p>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <p className="mt-4 text-text-light dark:text-text-dark">Carregando dados...</p>
                 </div>
               </div>
             )}
@@ -218,7 +217,7 @@ function DailyDashboard() {
                 <YAxis
                   yAxisId="left"
                   orientation="left"
-                  stroke="#2563EB"
+                  stroke="#404b62"
                   tickFormatter={(value) => formatCurrency(value)}
                 />
                 <YAxis yAxisId="right" orientation="right" stroke="#059669" />
@@ -254,7 +253,7 @@ function DailyDashboard() {
                   yAxisId="left"
                   dataKey="affiliate_value"
                   name="Valor de Afiliação"
-                  fill="#F97316" // Cor laranja
+                  fill="#F97316"
                   radius={[4, 4, 0, 0]}
                   barSize={40}
                 />
