@@ -15,7 +15,7 @@ function Today() {
   const fetchTodayData = useCallback(async () => {
     try {
       setLoading(true);
-      const today = new Date('2025-01-20').toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
       const response = await axios.post('http://localhost:3000/api/transactions', {
         ordered_at_ini: today,
         ordered_at_end: today
