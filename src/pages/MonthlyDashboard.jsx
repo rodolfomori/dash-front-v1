@@ -3,6 +3,8 @@ import axios from 'axios'
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -113,6 +115,7 @@ function MonthlyDashboard() {
           date: dateStr,
           net_amount: 0,
           quantity: 0,
+          affiliate_value: 0,
         }
       }
 
@@ -124,16 +127,23 @@ function MonthlyDashboard() {
         const netAmount = Number(
           transaction?.calculation_details?.net_amount || 0,
         )
+        const affiliateValue = Number(
+          transaction?.calculation_details?.net_affiliate_value || 0,
+        )
 
         if (dailyDataMap[transactionDate]) {
           dailyDataMap[transactionDate].net_amount += netAmount
           dailyDataMap[transactionDate].quantity += 1
+          dailyDataMap[transactionDate].affiliate_value += affiliateValue
         }
       })
 
       // Converter para array e ordenar
       const chartData = Object.values(dailyDataMap)
-        .filter((day) => day.net_amount > 0 || day.quantity > 0)
+        .filter(
+          (day) =>
+            day.net_amount > 0 || day.quantity > 0 || day.affiliate_value > 0,
+        )
         .sort((a, b) => new Date(a.date) - new Date(b.date))
 
       // Calcular totais
@@ -145,6 +155,10 @@ function MonthlyDashboard() {
         (sum, day) => sum + day.quantity,
         0,
       )
+      const totalAffiliateValue = chartData.reduce(
+        (sum, day) => sum + day.affiliate_value,
+        0,
+      )
 
       // Atualizar estado imediatamente
       setMonthlyData({
@@ -152,6 +166,7 @@ function MonthlyDashboard() {
         totals: {
           total_transactions: totalQuantity,
           total_net_amount: totalNetAmount,
+          total_net_affiliate_value: totalAffiliateValue,
         },
       })
 
@@ -189,241 +204,156 @@ function MonthlyDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Dashboard de Metas Mensais
-          </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Dashboard de Metas Mensais
+        </h1>
 
-          {/* Resumo de Vendas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900">
-                Valor Total de Vendas
-              </h3>
-              <p className="mt-2 text-3xl font-bold text-blue-600">
-                {formatCurrency(monthlyData?.totals?.total_net_amount || 0)}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900">
-                Quantidade Total de Vendas
-              </h3>
-              <p className="mt-2 text-3xl font-bold text-green-600">
-                {monthlyData?.totals?.total_transactions || 0}
-              </p>
-            </div>
+        {/* Resumo Mensal */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Valor Total de Vendas
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-blue-600">
+              {formatCurrency(monthlyData?.totals?.total_net_amount || 0)}
+            </p>
           </div>
-
-          {/* Metas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Meta */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Meta</h3>
-                {editingGoal !== 'meta' ? (
-                  <button
-                    onClick={() => setEditingGoal('meta')}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Editar
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => saveGoal('meta')}
-                    className="text-green-500 hover:text-green-700"
-                  >
-                    OK
-                  </button>
-                )}
-              </div>
-              {editingGoal === 'meta' ? (
-                <input
-                  type="text"
-                  value={goals.meta}
-                  onChange={(e) => handleGoalChange('meta', e.target.value)}
-                  className="w-full border rounded px-2 py-1"
-                />
-              ) : (
-                <p className="text-2xl font-bold text-blue-600">{goals.meta}</p>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Quantidade de Vendas
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-green-600">
+              {monthlyData?.totals?.total_transactions || 0}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900">
+              Valor de Afiliações
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-orange-500">
+              {formatCurrency(
+                monthlyData?.totals?.total_net_affiliate_value || 0,
               )}
-              <div className="mt-2">
-                <p
-                  className={`text-sm ${
-                    metaProgress.meta.difference >= 0
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}
-                >
-                  {metaProgress.meta.difference >= 0 ? '+' : ''}
-                  {metaProgress.meta.difference}%
-                  {metaProgress.meta.difference >= 0
-                    ? ' adiantado'
-                    : ' atrasado'}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Progresso: {metaProgress.meta.actualProgress}% (Esperado:{' '}
-                  {metaProgress.meta.expectedProgress}%)
-                </p>
-              </div>
-            </div>
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900">Ticket Médio</h3>
+            <p className="mt-2 text-3xl font-bold text-purple-600">
+              {formatCurrency(
+                monthlyData?.totals?.total_net_amount &&
+                  monthlyData?.totals?.total_transactions
+                  ? monthlyData.totals.total_net_amount /
+                      monthlyData.totals.total_transactions
+                  : 0,
+              )}
+            </p>
+          </div>
+        </div>
 
-            {/* Super Meta */}
-            <div className="bg-white rounded-lg shadow p-6">
+        {/* Metas e Progresso */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {['meta', 'superMeta', 'ultraMeta'].map((metaType) => (
+            <div key={metaType} className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
-                  Super Meta
+                  {metaType === 'meta'
+                    ? 'Meta'
+                    : metaType === 'superMeta'
+                    ? 'Super Meta'
+                    : 'Ultra Meta'}
                 </h3>
-                {editingGoal !== 'superMeta' ? (
+                {editingGoal !== metaType ? (
                   <button
-                    onClick={() => setEditingGoal('superMeta')}
+                    onClick={() => setEditingGoal(metaType)}
                     className="text-blue-500 hover:text-blue-700"
                   >
                     Editar
                   </button>
                 ) : (
                   <button
-                    onClick={() => saveGoal('superMeta')}
+                    onClick={() => saveGoal(metaType)}
                     className="text-green-500 hover:text-green-700"
                   >
                     OK
                   </button>
                 )}
               </div>
-              {editingGoal === 'superMeta' ? (
+              {editingGoal === metaType ? (
                 <input
                   type="text"
-                  value={goals.superMeta}
-                  onChange={(e) =>
-                    handleGoalChange('superMeta', e.target.value)
-                  }
+                  value={goals[metaType]}
+                  onChange={(e) => handleGoalChange(metaType, e.target.value)}
                   className="w-full border rounded px-2 py-1"
                 />
               ) : (
                 <p className="text-2xl font-bold text-blue-600">
-                  {goals.superMeta}
+                  {goals[metaType]}
                 </p>
               )}
               <div className="mt-2">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{
+                      width: `${Math.min(
+                        metaProgress[metaType].actualProgress,
+                        100,
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
                 <p
-                  className={`text-sm ${
-                    metaProgress.superMeta.difference >= 0
+                  className={`text-sm mt-1 ${
+                    metaProgress[metaType].difference >= 0
                       ? 'text-green-600'
                       : 'text-red-600'
                   }`}
                 >
-                  {metaProgress.superMeta.difference >= 0 ? '+' : ''}
-                  {metaProgress.superMeta.difference}%
-                  {metaProgress.superMeta.difference >= 0
+                  {metaProgress[metaType].difference >= 0 ? '+' : ''}
+                  {metaProgress[metaType].difference}%
+                  {metaProgress[metaType].difference >= 0
                     ? ' adiantado'
                     : ' atrasado'}
                 </p>
-                <p className="text-xs text-gray-500">
-                  Progresso: {metaProgress.superMeta.actualProgress}% (Esperado:{' '}
-                  {metaProgress.superMeta.expectedProgress}%)
-                </p>
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Ultra Meta */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Ultra Meta
-                </h3>
-                {editingGoal !== 'ultraMeta' ? (
-                  <button
-                    onClick={() => setEditingGoal('ultraMeta')}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Editar
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => saveGoal('ultraMeta')}
-                    className="text-green-500 hover:text-green-700"
-                  >
-                    OK
-                  </button>
-                )}
-              </div>
-              {editingGoal === 'ultraMeta' ? (
-                <input
-                  type="text"
-                  value={goals.ultraMeta}
-                  onChange={(e) =>
-                    handleGoalChange('ultraMeta', e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              ) : (
-                <p className="text-2xl font-bold text-blue-600">
-                  {goals.ultraMeta}
-                </p>
-              )}
-              <div className="mt-2">
-                <p
-                  className={`text-sm ${
-                    metaProgress.ultraMeta.difference >= 0
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}
-                >
-                  {metaProgress.ultraMeta.difference >= 0 ? '+' : ''}
-                  {metaProgress.ultraMeta.difference}%
-                  {metaProgress.ultraMeta.difference >= 0
-                    ? ' adiantado'
-                    : ' atrasado'}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Progresso: {metaProgress.ultraMeta.actualProgress}% (Esperado:{' '}
-                  {metaProgress.ultraMeta.expectedProgress}%)
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Gráfico */}
-          <div className="bg-white rounded-lg shadow p-6 relative">
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Gráfico de Barras */}
+          <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Vendas Diárias
             </h3>
-            <div className="h-96 relative">
-              {loading && (
-                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
-                  <div className="flex flex-col items-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                    <p className="text-gray-600">Carregando dados...</p>
-                  </div>
-                </div>
-              )}
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData?.dailyData || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="date"
-                    tickFormatter={(dateStr) => {
-                      const date = new Date(dateStr)
-                      return date.toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                      })
-                    }}
+                    tickFormatter={(dateStr) => new Date(dateStr).getDate()}
                   />
                   <YAxis
                     yAxisId="left"
                     orientation="left"
                     stroke="#2563EB"
-                    tickFormatter={(value) => formatCurrency(value)}
+                    tickFormatter={formatCurrency}
                   />
                   <YAxis yAxisId="right" orientation="right" stroke="#059669" />
                   <Tooltip
                     formatter={(value, name) => {
-                      if (name === 'Valor Líquido') return formatCurrency(value)
+                      if (
+                        name === 'Valor Líquido' ||
+                        name === 'Valor de Afiliação'
+                      )
+                        return formatCurrency(value)
                       return `${value} vendas`
                     }}
-                    labelFormatter={(dateStr) => {
-                      const date = new Date(dateStr)
-                      return date.toLocaleDateString('pt-BR')
-                    }}
+                    labelFormatter={(dateStr) =>
+                      new Date(dateStr).toLocaleDateString('pt-BR')
+                    }
                   />
                   <Legend />
                   <Bar
@@ -431,18 +361,58 @@ function MonthlyDashboard() {
                     dataKey="net_amount"
                     name="Valor Líquido"
                     fill="#2563EB"
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
                   />
                   <Bar
                     yAxisId="right"
                     dataKey="quantity"
                     name="Quantidade"
                     fill="#059669"
-                    radius={[4, 4, 0, 0]}
-                    barSize={40}
+                  />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="affiliate_value"
+                    name="Valor de Afiliação"
+                    fill="#F97316"
                   />
                 </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Gráfico de Linha */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Progressão Mensal
+            </h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyData?.dailyData || []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(dateStr) => new Date(dateStr).getDate()}
+                  />
+                  <YAxis tickFormatter={formatCurrency} />
+                  <Tooltip
+                    formatter={(value) => formatCurrency(value)}
+                    labelFormatter={(dateStr) =>
+                      new Date(dateStr).toLocaleDateString('pt-BR')
+                    }
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="net_amount"
+                    name="Valor Líquido"
+                    stroke="#2563EB"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="affiliate_value"
+                    name="Valor de Afiliação"
+                    stroke="#F97316"
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
